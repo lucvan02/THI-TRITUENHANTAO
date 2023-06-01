@@ -19,7 +19,7 @@ class State:
         return sn
 
     def Print(self):
-        print("g =",self.g , ",h =",self.h, ",f =",self.g+self.h)
+        print(Fore.BLACK+"g =",self.g , ",h =",self.h, ",f =",self.g+self.h)
         draw_board(self.data)
 
     def Key(self):
@@ -75,10 +75,10 @@ class Operator:
                     return i, j
         return None
 
-    def Up(self, s):
+    def Up(self, s): #s la state
         if self.checkStateNull(s):
             return None
-        x, y = self.findPos(s)
+        x, y = self.findPos(s) #x la vi tri hang, i la vi tri cot
         if x == 0:
             return None
         return self.swap(s, x, y, self.i)
@@ -126,12 +126,14 @@ def Equal(O, G):
 def Path(O):
     if O.par != None:
         Path(O.par)
-        if O.op.i == 0: print("Up")
-        if O.op.i == 1: print("Down")
-        if O.op.i == 2: print("Left")
-        if O.op.i == 3: print("Right")
+        if O.op.i == 0: print(Fore.RED+"Up")
+        if O.op.i == 1: print(Fore.RED+"Down")
+        if O.op.i == 2: print(Fore.RED+"Left")
+        if O.op.i == 3: print(Fore.RED+"Right")
     O.Print()
 
+
+#ham danh gia tra ve so vi tri o chu khac nhau cua trang thai hien tai va trang thai dich
 def Hx(S, G):
     res = 0
     for i in range(9):
@@ -144,28 +146,36 @@ def Hx(S, G):
 def taciAstar(S, G):
     Open = PriorityQueue()
     Closed = PriorityQueue()
-    Open.put(S)
     S.g = 0
     S.h = Hx(S, G)
     Open.put(S)
     while True:
         if Open.empty() == True:
-            print('Khong tim thay duong di')
+            print(Fore.BLUE+"Khong tim thay duong di")
             return
         O = Open.get()
-        Closed.put(O)
         if Equal(O, G) == True:
-            print("Tim thay duong di:")
+            print(Fore.BLUE+"Tim thay duong di:")
             print()
             Path(O)
             return
-
+        else: print("Xet trang thai tiep theo: ")
+        print(Fore.RED+"Trang thai hien tai: ")
+        O.Print()
         # tim tat ca cac trang thai con
         for i in range(4):
             op = Operator(i)
             child = op.Move(O)
             if child == None:
                 continue
+            # in cac buoc di chuyen phia la cac trang thai con ra man hinh
+            if i == 0: print("Up")
+            if i == 1: print("Down")
+            if i == 2: print("Left")
+            if i == 3: print("Right")
+            child.g = O.g + 1
+            child.h = Hx(child, G)
+            child.Print()
             ok1 = child in Open.queue
             ok2 = child in Closed.queue
             if not ok1 and not ok2:
@@ -174,18 +184,18 @@ def taciAstar(S, G):
                 child.g = O.g + 1
                 child.h = Hx(child, G)
                 Open.put(child)
-       # print("Xet state tiep")
+        Closed.put(O)
+
 
 def draw_board(board):
     for i in range(3):
         for j in range(3):
             if board[i*3+j] == 0:
-                print(Fore.WHITE + Back.RED + ' x ' + Style.RESET_ALL, end=' ')
+                print(Fore.WHITE + Back.RED + ' x ' + Style.RESET_ALL, end=" ")
             else:
                 print(Fore.BLACK + Back.LIGHTYELLOW_EX + f' {board[i*3+j]} ' + Style.RESET_ALL, end=' ')
         print()
     print()
-
 
 def main():
     import time
